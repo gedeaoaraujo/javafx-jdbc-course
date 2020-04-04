@@ -8,6 +8,4 @@ module NovoJavaFXTeste {
 
     opens application;
     opens gui;
-    opens model.entities;
-    opens model.services;
 }
