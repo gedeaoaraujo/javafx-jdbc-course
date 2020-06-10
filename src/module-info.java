@@ -4,6 +4,7 @@ module NovoJavaFXTeste {
     requires java.sql;
 
     exports gui;
+    exports gui.listeners;
     exports model.entities;
     exports model.services;
 
