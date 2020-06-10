@@ -1,7 +1,8 @@
 module NovoJavaFXTeste {
+    requires java.sql;
     requires javafx.fxml;
     requires javafx.controls;
-    requires java.sql;
+    requires org.jetbrains.annotations;
 
     exports gui;
     exports gui.listeners;

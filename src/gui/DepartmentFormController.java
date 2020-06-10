@@ -13,12 +13,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Department;
+import model.exceptions.ValidationException;
 import model.services.DepartmentService;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class DepartmentFormController implements Initializable {
 
@@ -26,7 +25,7 @@ public class DepartmentFormController implements Initializable {
 
     private DepartmentService service;
 
-    private List<DataChangeListener> dataChangeListeners = new ArrayList<>();
+    private final List<DataChangeListener> dataChangeListeners = new ArrayList<>();
 
     @FXML
     private TextField textFieldId;
@@ -68,7 +67,11 @@ public class DepartmentFormController implements Initializable {
             service.saveOrUpdate(entity);
             notifyDataChangeListeners();
             Utils.currentStage(event).close();
-        }catch (DbException e ){
+        }
+        catch (ValidationException e){
+            setErrorMessages(e.getErrors());
+        }
+        catch (DbException e ){
             Alerts.showAlert("Error saving object", null, e.getMessage(), AlertType.ERROR);
         }
     }
@@ -82,8 +85,19 @@ public class DepartmentFormController implements Initializable {
     private Department getFormData() {
         Department object = new Department();
 
+        ValidationException exception = new ValidationException("Validation error");
+
         object.setId(Utils.tryParseToInt(textFieldId.getText()));
+
+        if(textFieldName.getText() == null || textFieldName.getText().trim().equals("")){
+            exception.addError("name", "Field can't be empty");
+        }
+
         object.setName(textFieldName.getText());
+
+        if(exception.getErrors().size() > 0){
+            throw exception;
+        }
 
         return object;
     }
@@ -109,5 +123,13 @@ public class DepartmentFormController implements Initializable {
         }
         textFieldId.setText(String.valueOf(entity.getId()));
         textFieldName.setText(entity.getName());
+    }
+
+    public void setErrorMessages(Map<String, String> errors){
+        Set<String> fields = errors.keySet();
+
+        if(fields.contains("name")){
+            labelErrorName.setText(errors.get("name"));
+        }
     }
 }
