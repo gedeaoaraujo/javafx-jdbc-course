@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Seller;
@@ -17,6 +18,8 @@ import model.exceptions.ValidationException;
 import model.services.SellerService;
 
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 public class SellerFormController implements Initializable {
@@ -34,7 +37,25 @@ public class SellerFormController implements Initializable {
     private TextField textFieldName;
 
     @FXML
+    private TextField textFieldEmail;
+
+    @FXML
+    private DatePicker datePickerBirthDate;
+
+    @FXML
+    private TextField textFieldBaseSalary;
+
+    @FXML
     private Label labelErrorName;
+
+    @FXML
+    private Label labelErrorEmail;
+
+    @FXML
+    private Label labelErrorBirthDate;
+
+    @FXML
+    private Label labelErrorBaseSalary;
 
     @FXML
     private Button buttonSave;
@@ -114,7 +135,10 @@ public class SellerFormController implements Initializable {
 
     private void initializeNodes(){
         Constraints.setTextFieldInteger(textFieldId);
-        Constraints.setTextFieldMaxLength(textFieldName, 30);
+        Constraints.setTextFieldMaxLength(textFieldName, 70);
+        Constraints.setTextFieldDouble(textFieldBaseSalary);
+        Constraints.setTextFieldMaxLength(textFieldEmail, 60);
+        Utils.formatDatePicker(datePickerBirthDate, "dd/MM/yyyy");
     }
 
     public void updateFormData(){
@@ -123,6 +147,14 @@ public class SellerFormController implements Initializable {
         }
         textFieldId.setText(String.valueOf(entity.getId()));
         textFieldName.setText(entity.getName());
+        textFieldEmail.setText(entity.getEmail());
+        textFieldBaseSalary.setText(String.format("%.2f", entity.getBaseSalary()));
+
+        Locale.setDefault(Locale.US);
+
+        if(entity.getBirthDate() != null) {
+            datePickerBirthDate.setValue(LocalDate.ofInstant(entity.getBirthDate().toInstant(), ZoneId.systemDefault()));
+        }
     }
 
     public void setErrorMessages(Map<String, String> errors){
